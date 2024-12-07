@@ -1,38 +1,35 @@
 class Solution:
     def longestPalindrome(self, s: str) -> str:
         length = len(s)
-        left = 0
-        right = 0
-        longest = 1
-        found = s[0]
-        current = 0
+        longest = s[0]
+        longest_length = 1
 
-        while right < length:
-            if s[left] == s[right]:
-                if right == left:
-                    current = 1
-                    right += 1
-                    continue
-                elif right - left == 1:
-                    current = 2
-                    if current > longest:
-                        longest = current
+        for i in range(length):
+            # Assume the center is a character
+            left = i
+            right = i
 
-                else:
-                    current += 2
-                    if current > longest:
-                        longest = current
+            # Expand from the center until the characters are different
+            while left >= 0 and right < length and s[left] == s[right]:
                 left -= 1
-                if left < 0:
-                    left = right
-                    current = 0
                 right += 1
-            if s[left] != s[right]:
-                if right - left == 1:
-                    left -= 1
-                else:
-                    left = right
-                    current = 0
+
+            # If the length of the palindrome is longer than the previous one, update the longest palindrome
+            if right - left - 1 > longest_length:
+                longest = s[left + 1:right]
+                longest_length = right - left - 1
+
+            # Assume the center is between two characters
+            # Repeat the same process as above
+            left = i
+            right = i + 1
+
+            while left >= 0 and right < length and s[left] == s[right]:
+                left -= 1
+                right += 1
+
+            if right - left - 1 > longest_length:
+                longest = s[left + 1:right]
+                longest_length = right - left - 1
 
         return longest
-
