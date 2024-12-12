@@ -5,41 +5,47 @@ class List(list):
 class Solution:
     def fourSum(self, nums: List[int], target: int) -> List[List[int]]:
         nums.sort()
+        print(nums)
         n = len(nums)
         results = set()
-        print(nums)
 
-        for i in range(n - 3):
-            min = i + 1
-            max = n - 1
-            while min < max:
-                left = min + 1
-                right = max - 1
-                success = False
-                while left <= right:
-                    mid = (left + right) // 2
-                    sum = nums[i] + nums[min] + nums[mid] + nums[max]
-                    # print(f"Checking {nums[i]}, {nums[min]}, {nums[mid]}, {nums[max]}")
-                    if sum == target:
-                        # print(f"found {nums[i]}, {nums[min]}, {nums[mid]}, {nums[max]}")
-                        results.add((nums[i], nums[min], nums[mid], nums[max]))
-                        max -= 1
-                        success = True
-                        break
-                    elif sum < target:
-                        left = mid + 1
-                    else:
-                        right = mid - 1
+        min = 0
+        while min < n - 3:
+            max = min + 3
+            while max < n - 1:
+                result = self.twoSum(nums[min + 1:max], target - nums[min] - nums[max])
+                for r in result:
+                    results.add(tuple([r[0], r[1], nums[min], nums[max]]))
+                print(result)
+                max += 1
+                while max < n - 1 and nums[max] == nums[max + 1]:
+                    max += 1
 
-                if not success:
-                    min += 1
+            result = self.twoSum(nums[min + 1:max], target - nums[min] - nums[max])
+            for r in result:
+                results.add(tuple([r[0], r[1], nums[min], nums[max]]))
+            print(result)
+            min += 1
+            while min < n - 3 and nums[min] == nums[min - 1]:
+                min += 1
 
-        final_results = []
+        final = []
         for result in results:
-            final_results.append(list(result))
-        return final_results
+            final.append(list(result))
+        return final
+
+    def twoSum(self, nums: List[int], target: int) -> List[int]:
+        dic = {}
+        results = []
+        for num in nums:
+            if num in dic:
+                if dic[num][1]:
+                    continue
+                results.append([dic[num][0], num])
+            dic[target - num] = [num, False]
+        return results
 
 
-nums = [-1,0,1,2,-1,-4]
-target = -1 
+nums = [1,0,-1,0,-2,2]
+target = 0 
 print(Solution().fourSum(nums, target))
