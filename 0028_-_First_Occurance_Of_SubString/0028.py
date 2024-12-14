@@ -17,7 +17,7 @@ class Solution:
         rh_index = strlen - 1
         while rh_index < haylen:
             curr_index = rh_index
-
+P
             i = strlen - 1
             while i >= 0:
                 if needle[i] == haystack[curr_index]:
