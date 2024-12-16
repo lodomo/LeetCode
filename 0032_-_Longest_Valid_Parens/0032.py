@@ -1,34 +1,86 @@
+import re
+
+
 class Solution:
     def longestValidParentheses(self, s: str) -> int:
+        strlen = len(s)
+        newStart = 0
+        newEnd = strlen - 1
+        while newStart < newEnd:
+            if s[newStart] != "(":
+                newStart += 1
+                continue
+            break
+
+        while newEnd > newStart:
+            if s[newEnd] != ")":
+                newEnd -= 1
+                continue
+            break
+
+        if newStart >= newEnd:
+            return 0
+
+        s = s[newStart:newEnd + 1]
+        strlen = len(s)
         stack = []
-        pair = []
-        temp = []
-        for char in s:
-            if char == '(':
-                stack.append(char)
+        L = -1
+        R = -2
+        for i in range(strlen):
+            if s[i] == "(":
+                stack.append(L)
                 continue
 
-            if not stack:
-                pair = pair + temp
-                pair.append(0)
+            if len(stack) == 0:
                 continue
 
-            stack.pop()
-            temp.append(1)
+            if stack[-1] == L:
+                stack.pop()
+                stack.append(2)
+                continue
 
-        if stack:
-            pair.append(0)
-        pair = pair + temp
+            if stack[-1] == R:
+                stack.append(R)
+                continue
 
-        # Now we have a list of 1s and 0s
-        # We want to find the longest contiguous sequence of 1s
-        max_found = 0
-        count = 0
-        for p in pair:
-            if p == 1:
-                count += 1
-            else:
-                max_found = max(max_found, count)
-                count = 0
+            if len(stack) > 1 and stack[-1] > 0:
+                if stack[-2] == L:
+                    current = stack.pop()
+                    stack.pop()
+                    stack.append(current + 2)
+                    continue
 
-        return max(max_found * 2, count * 2)
+                if stack[-2] == R:
+                    stack.append(R)
+                    continue
+
+        print(stack)
+
+        running_total = 0
+        max_total = 0
+        stack_len = len(stack)
+        for i in range(stack_len):
+            if stack[i] == L or stack[i] == R:
+                max_total = max(max_total, running_total)
+                running_total = 0
+                continue
+
+            running_total += stack[i]
+        max_total = max(max_total, running_total)
+
+        return max_total
+
+
+case1 = "(()"
+case2 = ")()())"
+case3 = ""
+case4 = "()(())"
+caseMy = "((((((("
+caseMy2 = ")))))))"
+caseMy3 = "))))))()(((((("
+
+cases = [case1, case2, case3, case4, caseMy, caseMy2, caseMy3]
+
+for case in cases:
+    print(f"Running case: {case}")
+    print(Solution().longestValidParentheses(case))
