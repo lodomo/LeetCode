@@ -49,3 +49,18 @@ class BinarySearch:
                 left = mid + 1
 
         return result
+
+
+def greatest_less_than(nums, target):
+    low, high = 0, len(nums) - 1
+    candidate = None  # Stores the greatest number < target
+    
+    while low <= high:
+        mid = (low + high) // 2
+        if nums[mid] < target:
+            candidate = nums[mid]  # Potential candidate
+            low = mid + 1  # Search the right half
+        else:
+            high = mid - 1  # Search the left half
+            
+    return candidate
