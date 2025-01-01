@@ -124,13 +124,8 @@ class SudokuSolver:
                     continue
 
                 if len(self.candidates[row][col]) == 1:
-                    self.board[row][col] = self.candidates[row][col].pop()
-                    self.rows[row].add(self.board[row][col])
-                    self.cols[col].add(self.board[row][col])
-                    self.sqrs[self.getSquare(row, col)].add(
-                        self.board[row][col])
-                    self.empty_cells -= 1
-                    self.candidates[row][col] = set()
+                    val = self.candidates[row][col].pop()
+                    self.setSquare(val, row, col)
 
     def horizontalDiffs(self, row_y, col_x):
         this_set = self.candidates[row_y][col_x]
@@ -150,57 +145,29 @@ class SudokuSolver:
             dif_set = dif_set.union(self.candidates[row][col_x])
         return this_set - dif_set
 
-    def squareDiffs(self, row_y, col_x):
-        this_set = self.candidates[row_y][col_x]
-        dif_set = set()
-        for row in range(3):
-            for col in range(3):
-                if row == row_y and col == col_x:
-                    continue
-                dif_set = dif_set.union(
-                    self.candidates[row_y - row_y % 3 + row][col_x - col_x % 3 + col]
-                )
-        return this_set - dif_set
+    def setSquare(self, val, row, col):
+        self.board[row][col] = val
+        self.rows[row].add(val)
+        self.cols[col].add(val)
+        self.sqrs[self.getSquare(row, col)].add(val)
+        self.empty_cells -= 1
+        self.candidates[row][col] = set()
 
-    def horizontalWin(self):
+    def horizontalHiddenSingles(self):
         for col1 in range(9):
             for row in range(9):
                 diff = self.horizontalDiffs(row, col1)
                 if len(diff) == 1:
-                    self.board[row][col1] = diff.pop()
-                    self.rows[row].add(self.board[row][col1])
-                    self.cols[col1].add(self.board[row][col1])
-                    self.sqrs[self.getSquare(row, col1)].add(
-                        self.board[row][col1])
-                    self.empty_cells -= 1
-                    self.candidates[row][col1] = set()
+                    val = diff.pop()
+                    self.setSquare(val, row, col1)
 
-    def verticalWin(self):
+    def verticalHiddenSingles(self):
         for row1 in range(9):
             for col in range(9):
                 diff = self.verticalDiffs(row1, col)
                 if len(diff) == 1:
-                    self.board[row1][col] = diff.pop()
-                    self.rows[row1].add(self.board[row1][col])
-                    self.cols[col].add(self.board[row1][col])
-                    self.sqrs[self.getSquare(row1, col)].add(
-                        self.board[row1][col])
-                    self.empty_cells -= 1
-                    self.candidates[row1][col] = set()
-
-    def squareWin(self):
-        for square in range(9):
-            for row in range(3):
-                for col in range(3):
-                    diff = self.squareDiffs(row, col)
-                    if len(diff) == 1:
-                        self.board[row][col] = diff.pop()
-                        self.rows[row].add(self.board[row][col])
-                        self.cols[col].add(self.board[row][col])
-                        self.sqrs[self.getSquare(row, col)].add(
-                            self.board[row][col])
-                        self.empty_cells -= 1
-                        self.candidates[row][col] = set()
+                    val = diff.pop()
+                    self.setSquare(val, row1, col)
 
     def isSameBoard(self, board1, board2):
         for i in range(9):
@@ -223,17 +190,12 @@ class SudokuSolver:
             self.printPretty(self.board)
 
             print("Horizontal Scan")
-            self.horizontalWin()
+            self.horizontalHiddenSingles()
             self.updateCandidates()
             self.printPretty(self.board)
 
             print("Vertical Scan")
-            self.verticalWin()
-            self.printPretty(self.board)
-            self.updateCandidates()
-
-            print("Square Scan")
-            self.squareWin()
+            self.verticalHiddenSingles()
             self.printPretty(self.board)
             self.updateCandidates()
 
